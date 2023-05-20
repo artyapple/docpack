@@ -11,6 +11,7 @@ import {GetCurrentFolderId} from "../../../../../wailsjs/go/main/App";
   styleUrls: ['./main-board.component.scss']
 })
 export class MainBoardComponent {
+  docSetName: string  = '';
 
 }
 

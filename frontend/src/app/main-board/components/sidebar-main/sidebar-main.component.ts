@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnDestroy, Output} from '@angular/core';
 import {DocSet} from "../../../models/docset";
 import {Subscription} from "rxjs";
 import {DocPackServiceService} from "../../../service/doc-pack-service.service";
+import {ModalService} from "../../../service/modal.service";
 
 @Component({
   selector: 'app-sidebar-main',
@@ -9,18 +10,21 @@ import {DocPackServiceService} from "../../../service/doc-pack-service.service";
   styleUrls: ['./sidebar-main.component.scss']
 })
 export class SidebarMainComponent implements OnDestroy {
+  isHidden = false
+  @Output() onPlusClick = new EventEmitter<boolean>();
   currentFolderId: string | null = null;
   docSetMaps = new Map<string, DocSet>();
-  sideBarToogle: boolean;
-  addButtonToogle: boolean;
+  editFolderNameActive = false;
+  addButtonToogle: boolean = false;
+  @Output()
   docSetName: string  = '';
 
   chatSubscription: Subscription = new Subscription;
 
-  constructor(private fileService: DocPackServiceService) {
+  constructor(private fileService: DocPackServiceService, private modalService: ModalService) {
     this.subscribeToChat()
-    this.sideBarToogle = true;
-    this.addButtonToogle = true
+    this.editFolderNameActive = false;
+    this.addButtonToogle = false
   }
 
   subscribeToChat() {
@@ -51,25 +55,62 @@ export class SidebarMainComponent implements OnDestroy {
   }
 
   renameFolder(id: string) {
+    // @ts-ignore
+    this.docSetName = this.docSetMaps.get(id).packName
+    this.modalService.open('edit-folder-modal')
     console.log("rename")
+    //this.onPlusClick.emit(true);
   }
 
-  sideBarOpenClose(){
-    this.sideBarToogle = !this.sideBarToogle
+  toggleEditFolderNameActive(){
+    this.editFolderNameActive = !this.editFolderNameActive
   }
 
   changeAddButtonToogle(){
     this.addButtonToogle = !this.addButtonToogle
   }
 
-  newDocSet() {
-    console.log("NEW DOC SET!")
-    if(this.docSetName!=''){
-      this.fileService.createDocSet(this.docSetName).then((docsetId)=>{
+  openCreateNewFolderDialog(){
+    this.modalService.open('create-folder-modal')
+  }
+
+  newDocSet(newName: string) {
+    console.log("NEW DOC SET! newName: "+newName)
+    console.log("NEW DOC SET! newName: "+this.docSetName)
+    if(newName!=''){
+      this.fileService.createDocSet(newName).then((docsetId)=>{
         this.docSetName = ''
         this.changeCurrentFolderId(docsetId)
       })
     }
     this.changeAddButtonToogle()
+  }
+
+  isCurrentFolder(id: string){
+    return id == this.currentFolderId
+  }
+
+  isCurrentFolderInEdit(id: string){
+    if(this.isCurrentFolder(id)){
+      return this.editFolderNameActive
+    }
+    return false
+  }
+
+  changeDocSetName() {
+    console.log("EDIT DOC SET!")
+    if(this.docSetName!=''){
+      // this.fileService.createDocSet(this.docSetName).then((docsetId)=>{
+      //   this.docSetName = ''
+      //   this.changeCurrentFolderId(docsetId)
+      // })
+      console.log("new name:"+this.docSetName)
+      this.docSetName = ''
+    }
+    this.toggleEditFolderNameActive()
+  }
+
+  onResult(result: string) {
+    this.newDocSet(result)
   }
 }

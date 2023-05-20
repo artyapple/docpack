@@ -7,11 +7,13 @@ import { DocsGridComponent } from './components/docs-grid/docs-grid.component';
 import { SidebarMainComponent } from './components/sidebar-main/sidebar-main.component';
 import {SharedModule} from "../shared/shared.module";
 import {DocViewModule} from "../doc-view/doc-view.module";
+import { NameEditWindowComponent } from './components/name-edit-window/name-edit-window.component';
 @NgModule({
   declarations: [
     MainBoardComponent,
     DocsGridComponent,
-    SidebarMainComponent
+    SidebarMainComponent,
+    NameEditWindowComponent
   ],
   imports: [
     CommonModule,

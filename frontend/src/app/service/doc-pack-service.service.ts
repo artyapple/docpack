@@ -96,4 +96,10 @@ export class DocPackServiceService {
     })
     this.foldersSubject$.next(docSetMap)
   }
+
+  getFolderNames(){
+    return GetFolders().then((f)=>{
+      return f.map(fol => fol.name)
+    })
+  }
 }
